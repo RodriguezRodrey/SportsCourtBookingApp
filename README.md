@@ -2,6 +2,13 @@
 
 Sports Court Booking App is a React Native mobile application built with Expo for managing sports venue.
 
+## Team
+
+| Name             | Role      |
+| ---------------- | --------- |
+| Steven Alonzo    | Developer |
+| Rodrey Rodriguez | Developer |
+
 ## Get started
 
 1. Install dependencies
