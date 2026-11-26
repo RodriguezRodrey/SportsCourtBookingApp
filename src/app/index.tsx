@@ -1,9 +1,17 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 export default function Index() {
   return (
     <View style={styles.container}>
+      <Animated.View entering={FadeInDown.delay(400)}>
+        <Image
+          source={require("@/assets/images/sportsball.jpg")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </Animated.View>
+
       <Animated.View entering={FadeInDown.delay(600)}>
         <Text style={styles.title}>Sports Court Booking</Text>
       </Animated.View>
@@ -31,6 +39,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  logo: {
+    width: 240,
+    height: 240,
   },
   title: {
     fontSize: 28,

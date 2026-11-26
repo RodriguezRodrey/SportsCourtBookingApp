@@ -1,22 +1,23 @@
 // src/database/db.ts
 // Install: npx expo install expo-sqlite expo-crypto
-import * as Crypto from 'expo-crypto';
-import * as SQLite from 'expo-sqlite';
+import * as Crypto from "expo-crypto";
+import * as SQLite from "expo-sqlite";
 import type {
-    Booking,
-    Maintenance,
-    NewBooking,
-    NewMaintenance,
-    NewVenue,
-    User, Venue,
-} from './types';
+  Booking,
+  Maintenance,
+  NewBooking,
+  NewMaintenance,
+  NewVenue,
+  User,
+  Venue,
+} from "./types";
 
 /* ---------- Connection ---------- */
 
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
 function getDb() {
-  if (!dbPromise) dbPromise = SQLite.openDatabaseAsync('courts.db');
+  if (!dbPromise) dbPromise = SQLite.openDatabaseAsync("courts.db");
   return dbPromise;
 }
 
@@ -83,26 +84,50 @@ CREATE INDEX IF NOT EXISTS idx_maint_venue      ON maintenance(venue_id, date);
 /* ---------- Row mappers (snake_case -> camelCase) ---------- */
 
 const toUser = (r: any): User => ({
-  id: r.id, name: r.name, email: r.email, role: r.role, createdAt: r.created_at,
+  id: r.id,
+  name: r.name,
+  email: r.email,
+  role: r.role,
+  createdAt: r.created_at,
 });
 
 const toVenue = (r: any): Venue => ({
-  id: r.id, name: r.name, location: r.location,
-  sports: r.sports ? String(r.sports).split(',') : [],
-  pricePerHour: r.price_per_hour, openTime: r.open_time, closeTime: r.close_time,
-  courtCount: r.court_count, bookingLink: r.booking_link, description: r.description,
+  id: r.id,
+  name: r.name,
+  location: r.location,
+  sports: r.sports ? String(r.sports).split(",") : [],
+  pricePerHour: r.price_per_hour,
+  openTime: r.open_time,
+  closeTime: r.close_time,
+  courtCount: r.court_count,
+  bookingLink: r.booking_link,
+  description: r.description,
 });
 
 const toBooking = (r: any): Booking => ({
-  id: r.id, userId: r.user_id, venueId: r.venue_id, venueName: r.venue_name,
-  courtNumber: r.court_number, activity: r.activity, date: r.date,
-  startTime: r.start_time, endTime: r.end_time, contactNumber: r.contact_number,
-  totalPrice: r.total_price, status: r.status, createdAt: r.created_at,
+  id: r.id,
+  userId: r.user_id,
+  venueId: r.venue_id,
+  venueName: r.venue_name,
+  courtNumber: r.court_number,
+  activity: r.activity,
+  date: r.date,
+  startTime: r.start_time,
+  endTime: r.end_time,
+  contactNumber: r.contact_number,
+  totalPrice: r.total_price,
+  status: r.status,
+  createdAt: r.created_at,
 });
 
 const toMaintenance = (r: any): Maintenance => ({
-  id: r.id, venueId: r.venue_id, courtNumber: r.court_number, date: r.date,
-  startTime: r.start_time, endTime: r.end_time, reason: r.reason,
+  id: r.id,
+  venueId: r.venue_id,
+  courtNumber: r.court_number,
+  date: r.date,
+  startTime: r.start_time,
+  endTime: r.end_time,
+  reason: r.reason,
 });
 
 /* ---------- Init + seed ---------- */
@@ -115,23 +140,51 @@ export async function initDatabase(): Promise<void> {
 
 async function seedIfEmpty() {
   const db = await getDb();
-  const row = await db.getFirstAsync<{ n: number }>('SELECT COUNT(*) AS n FROM venues');
+  const row = await db.getFirstAsync<{ n: number }>(
+    "SELECT COUNT(*) AS n FROM venues",
+  );
   if (row && row.n > 0) return;
 
   // Default admin account: change this before submission.
-  await createUser('Administrator', 'admin@court.app', 'admin123', 'admin');
+  await createUser("Administrator", "admin@court.app", "admin123", "admin");
+  // Default user account: change this before submission.
+  await createUser("User", "user@court.app", "user123", "user");
 
   // SAMPLE DATA: replace with the real venues your group collected.
   const venues: NewVenue[] = [
-    { name: 'Sample Sports Complex', location: 'Tagum City', sports: ['Basketball', 'Volleyball'],
-      pricePerHour: 400, openTime: '08:00', closeTime: '22:00', courtCount: 2,
-      bookingLink: null, description: 'Indoor courts with lights.' },
-    { name: 'Sample Badminton Hall', location: 'Tagum City', sports: ['Badminton'],
-      pricePerHour: 250, openTime: '09:00', closeTime: '21:00', courtCount: 4,
-      bookingLink: null, description: 'Four wooden-floor badminton courts.' },
-    { name: 'Sample Futsal Arena', location: 'Tagum City', sports: ['Futsal', 'Football'],
-      pricePerHour: 800, openTime: '10:00', closeTime: '23:00', courtCount: 1,
-      bookingLink: null, description: 'Artificial turf, 5-a-side.' },
+    {
+      name: "Sample Sports Complex",
+      location: "Tagum City",
+      sports: ["Basketball", "Volleyball"],
+      pricePerHour: 400,
+      openTime: "08:00",
+      closeTime: "22:00",
+      courtCount: 2,
+      bookingLink: null,
+      description: "Indoor courts with lights.",
+    },
+    {
+      name: "Sample Badminton Hall",
+      location: "Tagum City",
+      sports: ["Badminton"],
+      pricePerHour: 250,
+      openTime: "09:00",
+      closeTime: "21:00",
+      courtCount: 4,
+      bookingLink: null,
+      description: "Four wooden-floor badminton courts.",
+    },
+    {
+      name: "Sample Futsal Arena",
+      location: "Tagum City",
+      sports: ["Futsal", "Football"],
+      pricePerHour: 800,
+      openTime: "10:00",
+      closeTime: "23:00",
+      courtCount: 1,
+      bookingLink: null,
+      description: "Artificial turf, 5-a-side.",
+    },
   ];
   for (const v of venues) await createVenue(v);
 }
@@ -139,27 +192,36 @@ async function seedIfEmpty() {
 /* ---------- Users ---------- */
 
 async function hashPassword(password: string): Promise<string> {
-  return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password);
+  return Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    password,
+  );
 }
 
 export async function createUser(
-  name: string, email: string, password: string, role: 'user' | 'admin' = 'user',
+  name: string,
+  email: string,
+  password: string,
+  role: "user" | "admin" = "user",
 ): Promise<number> {
   const db = await getDb();
   const hash = await hashPassword(password);
   const res = await db.runAsync(
-    'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+    "INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)",
     [name.trim(), email.trim().toLowerCase(), hash, role],
   );
   return res.lastInsertRowId; // throws if email already exists (UNIQUE)
 }
 
 /** Returns the user on success, or null if email/password is wrong. */
-export async function loginUser(email: string, password: string): Promise<User | null> {
+export async function loginUser(
+  email: string,
+  password: string,
+): Promise<User | null> {
   const db = await getDb();
   const hash = await hashPassword(password);
   const row = await db.getFirstAsync(
-    'SELECT * FROM users WHERE email = ? AND password_hash = ?',
+    "SELECT * FROM users WHERE email = ? AND password_hash = ?",
     [email.trim().toLowerCase(), hash],
   );
   return row ? toUser(row) : null;
@@ -168,7 +230,7 @@ export async function loginUser(email: string, password: string): Promise<User |
 /* ---------- Venues ---------- */
 
 /** Search by name/location (partial match) and optionally filter by sport. */
-export async function getVenues(search = '', sport = ''): Promise<Venue[]> {
+export async function getVenues(search = "", sport = ""): Promise<Venue[]> {
   const db = await getDb();
   const like = `%${search.trim()}%`;
   const rows = await db.getAllAsync(
@@ -183,13 +245,13 @@ export async function getVenues(search = '', sport = ''): Promise<Venue[]> {
 
 export async function getVenueById(id: number): Promise<Venue | null> {
   const db = await getDb();
-  const row = await db.getFirstAsync('SELECT * FROM venues WHERE id = ?', [id]);
+  const row = await db.getFirstAsync("SELECT * FROM venues WHERE id = ?", [id]);
   return row ? toVenue(row) : null;
 }
 
 export async function getAllSports(): Promise<string[]> {
   const venues = await getVenues();
-  return [...new Set(venues.flatMap(v => v.sports))].sort();
+  return [...new Set(venues.flatMap((v) => v.sports))].sort();
 }
 
 export async function createVenue(v: NewVenue): Promise<number> {
@@ -198,8 +260,17 @@ export async function createVenue(v: NewVenue): Promise<number> {
     `INSERT INTO venues (name, location, sports, price_per_hour, open_time, close_time,
                          court_count, booking_link, description)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [v.name, v.location, v.sports.join(','), v.pricePerHour, v.openTime, v.closeTime,
-     v.courtCount, v.bookingLink, v.description],
+    [
+      v.name,
+      v.location,
+      v.sports.join(","),
+      v.pricePerHour,
+      v.openTime,
+      v.closeTime,
+      v.courtCount,
+      v.bookingLink,
+      v.description,
+    ],
   );
   return res.lastInsertRowId;
 }
@@ -209,14 +280,24 @@ export async function updateVenue(id: number, v: NewVenue): Promise<void> {
   await db.runAsync(
     `UPDATE venues SET name=?, location=?, sports=?, price_per_hour=?, open_time=?,
             close_time=?, court_count=?, booking_link=?, description=? WHERE id=?`,
-    [v.name, v.location, v.sports.join(','), v.pricePerHour, v.openTime, v.closeTime,
-     v.courtCount, v.bookingLink, v.description, id],
+    [
+      v.name,
+      v.location,
+      v.sports.join(","),
+      v.pricePerHour,
+      v.openTime,
+      v.closeTime,
+      v.courtCount,
+      v.bookingLink,
+      v.description,
+      id,
+    ],
   );
 }
 
 export async function deleteVenue(id: number): Promise<void> {
   const db = await getDb();
-  await db.runAsync('DELETE FROM venues WHERE id = ?', [id]);
+  await db.runAsync("DELETE FROM venues WHERE id = ?", [id]);
 }
 
 /* ---------- Bookings ---------- */
@@ -227,8 +308,17 @@ export async function createBooking(b: NewBooking): Promise<number> {
     `INSERT INTO bookings (user_id, venue_id, court_number, activity, date, start_time,
                            end_time, contact_number, total_price)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [b.userId, b.venueId, b.courtNumber, b.activity, b.date, b.startTime,
-     b.endTime, b.contactNumber, b.totalPrice],
+    [
+      b.userId,
+      b.venueId,
+      b.courtNumber,
+      b.activity,
+      b.date,
+      b.startTime,
+      b.endTime,
+      b.contactNumber,
+      b.totalPrice,
+    ],
   );
   return res.lastInsertRowId;
 }
@@ -237,7 +327,9 @@ export async function getBookingById(id: number): Promise<Booking | null> {
   const db = await getDb();
   const row = await db.getFirstAsync(
     `SELECT b.*, v.name AS venue_name FROM bookings b
-     JOIN venues v ON v.id = b.venue_id WHERE b.id = ?`, [id]);
+     JOIN venues v ON v.id = b.venue_id WHERE b.id = ?`,
+    [id],
+  );
   return row ? toBooking(row) : null;
 }
 
@@ -267,18 +359,33 @@ export async function getAllBookings(): Promise<Booking[]> {
 /** Cancelled bookings are kept for history but never block a slot. */
 export async function cancelBooking(id: number): Promise<void> {
   const db = await getDb();
-  await db.runAsync("UPDATE bookings SET status = 'cancelled' WHERE id = ?", [id]);
+  await db.runAsync("UPDATE bookings SET status = 'cancelled' WHERE id = ?", [
+    id,
+  ]);
 }
 
 export async function rescheduleBooking(
   id: number,
-  changes: { courtNumber: number; date: string; startTime: string; endTime: string; totalPrice: number },
+  changes: {
+    courtNumber: number;
+    date: string;
+    startTime: string;
+    endTime: string;
+    totalPrice: number;
+  },
 ): Promise<void> {
   const db = await getDb();
   await db.runAsync(
     `UPDATE bookings SET court_number=?, date=?, start_time=?, end_time=?, total_price=?
      WHERE id=?`,
-    [changes.courtNumber, changes.date, changes.startTime, changes.endTime, changes.totalPrice, id],
+    [
+      changes.courtNumber,
+      changes.date,
+      changes.startTime,
+      changes.endTime,
+      changes.totalPrice,
+      id,
+    ],
   );
 }
 
@@ -289,8 +396,12 @@ export async function rescheduleBooking(
 
 /** Check 3: court overlap */
 export async function findCourtConflicts(
-  venueId: number, courtNumber: number, date: string,
-  startTime: string, endTime: string, excludeBookingId = -1,
+  venueId: number,
+  courtNumber: number,
+  date: string,
+  startTime: string,
+  endTime: string,
+  excludeBookingId = -1,
 ): Promise<Booking[]> {
   const db = await getDb();
   const rows = await db.getAllAsync(
@@ -304,8 +415,11 @@ export async function findCourtConflicts(
 
 /** Check 4: same contact number overlapping anywhere */
 export async function findContactConflicts(
-  contactNumber: string, date: string,
-  startTime: string, endTime: string, excludeBookingId = -1,
+  contactNumber: string,
+  date: string,
+  startTime: string,
+  endTime: string,
+  excludeBookingId = -1,
 ): Promise<Booking[]> {
   const db = await getDb();
   const rows = await db.getAllAsync(
@@ -319,8 +433,11 @@ export async function findContactConflicts(
 
 /** Check 2: maintenance (whole-venue closures have court_number NULL) */
 export async function findMaintenanceConflicts(
-  venueId: number, courtNumber: number, date: string,
-  startTime: string, endTime: string,
+  venueId: number,
+  courtNumber: number,
+  date: string,
+  startTime: string,
+  endTime: string,
 ): Promise<Maintenance[]> {
   const db = await getDb();
   const rows = await db.getAllAsync(
@@ -333,7 +450,10 @@ export async function findMaintenanceConflicts(
 }
 
 /** For the booking screen: which slots are taken on a given day. */
-export async function getBookingsForVenueOnDate(venueId: number, date: string): Promise<Booking[]> {
+export async function getBookingsForVenueOnDate(
+  venueId: number,
+  date: string,
+): Promise<Booking[]> {
   const db = await getDb();
   const rows = await db.getAllAsync(
     `SELECT * FROM bookings WHERE venue_id=? AND date=? AND status='confirmed'
@@ -355,14 +475,18 @@ export async function addMaintenance(m: NewMaintenance): Promise<number> {
   return res.lastInsertRowId;
 }
 
-export async function getMaintenanceByVenue(venueId: number): Promise<Maintenance[]> {
+export async function getMaintenanceByVenue(
+  venueId: number,
+): Promise<Maintenance[]> {
   const db = await getDb();
   const rows = await db.getAllAsync(
-    'SELECT * FROM maintenance WHERE venue_id=? ORDER BY date, start_time', [venueId]);
+    "SELECT * FROM maintenance WHERE venue_id=? ORDER BY date, start_time",
+    [venueId],
+  );
   return rows.map(toMaintenance);
 }
 
 export async function deleteMaintenance(id: number): Promise<void> {
   const db = await getDb();
-  await db.runAsync('DELETE FROM maintenance WHERE id = ?', [id]);
+  await db.runAsync("DELETE FROM maintenance WHERE id = ?", [id]);
 }
