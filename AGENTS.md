@@ -39,3 +39,9 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Collaboration & Learning
+
+- **Guide, don't edit**: By default, show *what* and *where* to change (file paths, line numbers, and code snippets) so the user can type and apply changes manually to learn. Only edit files or run `git commit`/`git push` directly when the user explicitly asks you to do it for them.
+- **Explain the why**: Briefly explain how each change works and how it fits into Expo, React Native, or TypeScript without assuming prior project knowledge.
+- **Verify every change works**: After the user applies changes (or when asked to check), run `npx eslint .` and `npx tsc --noEmit` to confirm there are no lint or type errors.
