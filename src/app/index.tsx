@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
@@ -23,10 +24,7 @@ export default function Index() {
       </Animated.View>
 
       <Animated.View entering={FadeInUp.delay(400).duration(600)}>
-        <Pressable
-          style={styles.button}
-          onPress={() => alert("Finding available courts...")}
-        >
+        <Pressable style={styles.button} onPress={() => router.push("/login")}>
           <Text style={styles.buttonText}>Explore Courts</Text>
         </Pressable>
       </Animated.View>
