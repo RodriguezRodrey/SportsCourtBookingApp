@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/context/auth";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
@@ -53,7 +54,11 @@ export default function RootLayout() {
     );
   }
 
-  return <Stack />;
+  return (
+    <AuthProvider>
+      <Stack />
+    </AuthProvider>
+  );
 }
 
 const styles = StyleSheet.create({

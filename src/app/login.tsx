@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/auth";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -9,6 +10,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useAuth();
 
   async function handleLogin() {
     if (!email.trim() || !password) {
@@ -25,6 +27,7 @@ export default function LoginScreen() {
         return;
       }
 
+      setUser(user);
       router.replace(user.role === "admin" ? "/admin" : "/user");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed.");
@@ -67,6 +70,12 @@ export default function LoginScreen() {
         >
           <Text style={styles.buttonText}>
             {isLoading ? "Signing in..." : "Sign In"}
+          </Text>
+        </Pressable>
+
+        <Pressable onPress={() => router.push("/register")}>
+          <Text style={styles.linkText}>
+            Don&apos;t have an account? Sign up
           </Text>
         </Pressable>
 
@@ -157,5 +166,12 @@ const styles = StyleSheet.create({
   hintText: {
     fontSize: 12,
     color: "#64748B",
+  },
+  linkText: {
+    textAlign: "center",
+    color: "#059669",
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 4,
   },
 });
