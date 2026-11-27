@@ -1,9 +1,43 @@
-import { AuthProvider } from "@/context/auth";
+import { AuthProvider, useAuth } from "@/context/auth";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 import { initDatabase } from "@/database/db";
+
+function AppNavigator() {
+  const { user } = useAuth();
+
+  const homeRoute = user?.role === "admin" ? "/admin" : "/user";
+  const userDeniedRoute = user ? "/admin" : "/login";
+  const adminDeniedrRoute = user ? "/user" : "/login";
+
+  return (
+    <Stack>
+      {/* Landing Screen */}
+      <Stack.Screen name="index" />
+
+      <Stack.Protected guard={!user} redirectTo={homeRoute}>
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" />
+      </Stack.Protected>
+
+      <Stack.Protected
+        guard={user?.role === "user"}
+        redirectTo={userDeniedRoute}
+      >
+        <Stack.Screen name="user" />
+      </Stack.Protected>
+
+      <Stack.Protected
+        guard={user?.role === "admin"}
+        redirectTo={adminDeniedrRoute}
+      >
+        <Stack.Screen name="admin" />
+      </Stack.Protected>
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   const [isDatabaseReady, setIsDatabaseReady] = useState(false);
@@ -56,7 +90,7 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <Stack />
+      <AppNavigator />
     </AuthProvider>
   );
 }
