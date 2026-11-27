@@ -50,7 +50,7 @@ export default function RegisterScreen() {
         <Text style={styles.label}>Full Name</Text>
         <TextInput
           style={styles.input}
-          placeholder="Name"
+          placeholder="Juan Dela Cruz"
           value={name}
           onChangeText={setName}
         />
